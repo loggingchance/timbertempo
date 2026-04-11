@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timber Tempo — Project Flow in Forestry</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bark: #2C1810;
+  --heartwood: #5C3A1E;
+  --sapwood: #A67C52;
+  --parchment: #F5EDE0;
+  --cream: #FAF6F0;
+  --moss: #2D5A27;
+  --moss-mid: #4A6741;
+  --moss-light: #6B8F5E;
+  --amber: #C8963E;
+  --orange: #D4742C;
+  --rust: #A0522D;
+  --ink: #1A1412;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Source Serif 4', Georgia, serif;
+  color: var(--ink);
+  background: var(--cream);
+  overflow-x: hidden;
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(45,90,39,0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(200,150,62,0.06) 0%, transparent 50%),
+    var(--cream);
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0v60M0 30h60' stroke='%232C1810' stroke-width='.3' opacity='.05'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -80px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 400px;
+  height: 400px;
+  border: 1px solid rgba(44,24,16,0.06);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-inner {
+  max-width: 900px;
+  padding: 60px 32px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-badge {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--moss);
+  margin-bottom: 32px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.2s forwards;
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3.5rem, 8vw, 7rem);
+  font-weight: 900;
+  line-height: 0.95;
+  color: var(--bark);
+  letter-spacing: -2px;
+  margin-bottom: 12px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.4s forwards;
+}
+
+.hero-subtitle {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--sapwood);
+  margin-bottom: 40px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.6s forwards;
+}
+
+.hero-author {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--heartwood);
+  margin-bottom: 48px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.8s forwards;
+}
+
+.hero-cta-group {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 0.8s 1s forwards;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 36px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.3s;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary { background: var(--moss); color: var(--cream); }
+.btn-primary:hover { background: var(--moss-mid); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(45,90,39,0.3); }
+
+.btn-secondary { background: transparent; color: var(--bark); border: 2px solid var(--sapwood); }
+.btn-secondary:hover { border-color: var(--bark); transform: translateY(-2px); }
+
+.hero-scroll {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  animation: fadeUp 0.8s 1.4s forwards;
+}
+
+.hero-scroll span {
+  display: block;
+  width: 2px;
+  height: 40px;
+  background: var(--sapwood);
+  margin: 0 auto 8px;
+  animation: scrollPulse 2s infinite;
+}
+
+.hero-scroll small {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--sapwood);
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--sapwood), transparent);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── ABOUT ── */
+.about {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 100px 32px;
+  text-align: center;
+}
+
+.about h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  color: var(--bark);
+  margin-bottom: 32px;
+  line-height: 1.2;
+}
+
+.about p {
+  font-size: 1.1rem;
+  line-height: 1.85;
+  color: var(--heartwood);
+  margin-bottom: 20px;
+  font-weight: 300;
+}
+
+.about p strong { font-weight: 600; color: var(--bark); }
+
+/* ── FRICTION STRIP ── */
+.friction-strip {
+  background: var(--bark);
+  padding: 80px 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.friction-strip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0v60M0 30h60' stroke='%23fff' stroke-width='.2' opacity='.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.friction-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.friction-inner h2 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--parchment);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.friction-inner .tagline {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--sapwood);
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.friction-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.friction-card {
+  border: 1px solid rgba(245,237,224,0.12);
+  border-top: 3px solid var(--orange);
+  padding: 28px 24px;
+  border-radius: 4px;
+}
+
+.friction-card h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--orange);
+  margin-bottom: 12px;
+}
+
+.friction-card p {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgba(245,237,224,0.75);
+  font-weight: 300;
+}
+
+/* ── QUOTE ── */
+.story-strip {
+  background: var(--parchment);
+  padding: 72px 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.story-strip::before {
+  content: '\201C';
+  font-family: 'Playfair Display', serif;
+  font-size: 16rem;
+  color: rgba(44,24,16,0.04);
+  position: absolute;
+  top: -40px;
+  left: 40px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.story-strip blockquote {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  font-style: italic;
+  color: var(--bark);
+  line-height: 1.7;
+  position: relative;
+  z-index: 1;
+}
+
+.story-strip cite {
+  display: block;
+  margin-top: 24px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--sapwood);
+}
+
+/* ── CHAPTERS ── */
+.chapters {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 100px 32px;
+}
+
+.chapters h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  color: var(--bark);
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.chapter-list { list-style: none; }
+
+.chapter-item {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(44,24,16,0.1);
+  transition: padding-left 0.3s;
+}
+.chapter-item:hover { padding-left: 12px; }
+
+.chapter-num {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--moss);
+  min-width: 28px;
+}
+
+.chapter-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--bark);
+}
+
+/* ── RULES OF FLOW ── */
+.rules {
+  background: var(--moss);
+  padding: 100px 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.rules::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='1' fill='%23fff' opacity='.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.rules-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.rules-inner h2 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--cream);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.rules-sub {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: rgba(245,237,224,0.65);
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.rule-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 24px 20px;
+  transition: transform 0.3s, background 0.3s;
+}
+.rule-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.1); }
+
+.rule-num {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--orange);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.rule-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.rule-card p {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: rgba(245,237,224,0.6);
+  font-weight: 300;
+}
+
+/* ── DISEASES ── */
+.diseases {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 100px 32px;
+}
+
+.diseases h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  color: var(--bark);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.diseases > p {
+  text-align: center;
+  max-width: 560px;
+  margin: 0 auto 56px;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--heartwood);
+  font-weight: 300;
+}
+
+.disease-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.disease-card {
+  background: var(--parchment);
+  padding: 28px 24px;
+  border-radius: 6px;
+  border-left: 3px solid var(--orange);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.disease-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(44,24,16,0.07); }
+
+.disease-card h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--moss);
+  margin-bottom: 8px;
+}
+
+.disease-card p {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--heartwood);
+  font-weight: 300;
+}
+
+/* ── TAKEAWAY ── */
+.takeaway-strip {
+  background: var(--parchment);
+  padding: 64px 32px;
+  border-top: 3px solid var(--orange);
+  border-bottom: 3px solid var(--orange);
+}
+
+.takeaway-strip .inner {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.takeaway-strip h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--orange);
+  margin-bottom: 16px;
+}
+
+.takeaway-strip p {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.15rem, 2.5vw, 1.45rem);
+  font-style: italic;
+  color: var(--bark);
+  line-height: 1.7;
+}
+
+/* ── WHO IT'S FOR ── */
+.topics {
+  padding: 100px 32px;
+}
+
+.topics h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  color: var(--bark);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.topics > p {
+  text-align: center;
+  max-width: 560px;
+  margin: 0 auto 56px;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--heartwood);
+  font-weight: 300;
+}
+
+.topics-grid {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.topic-card {
+  background: var(--parchment);
+  padding: 32px 28px;
+  border-radius: 6px;
+  border-left: 3px solid var(--moss);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.topic-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(44,24,16,0.08); }
+
+.topic-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--bark);
+  margin-bottom: 10px;
+}
+
+.topic-card p {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--heartwood);
+  font-weight: 300;
+}
+
+/* ── AUTHOR ── */
+.author {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 100px 32px;
+  text-align: center;
+}
+
+.author h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  color: var(--bark);
+  margin-bottom: 32px;
+}
+
+.author p {
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: var(--heartwood);
+  margin-bottom: 20px;
+  font-weight: 300;
+}
+
+.author-links {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+.author-links a {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--moss);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s;
+}
+.author-links a:hover { color: var(--bark); border-bottom-color: var(--bark); }
+
+/* ── CTA ── */
+.cta-strip {
+  background: var(--bark);
+  padding: 80px 32px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-strip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0v60M0 30h60' stroke='%23fff' stroke-width='.2' opacity='.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.cta-strip h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+  font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.cta-strip p {
+  font-size: 1.05rem;
+  color: rgba(245,237,224,0.7);
+  margin-bottom: 36px;
+  font-weight: 300;
+  position: relative;
+}
+
+.cta-strip .btn-group {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.btn-light { background: var(--cream); color: var(--bark); }
+.btn-light:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+
+.btn-outline-light { background: transparent; color: var(--cream); border: 2px solid rgba(245,237,224,0.4); }
+.btn-outline-light:hover { border-color: var(--cream); transform: translateY(-2px); }
+
+/* ── FOOTER ── */
+footer {
+  background: #1a0f0a;
+  padding: 48px 32px;
+  text-align: center;
+}
+
+footer p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: rgba(245,237,224,0.35);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+footer a { color: rgba(245,237,224,0.55); text-decoration: none; }
+footer a:hover { color: var(--parchment); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(0.6); transform-origin: top; }
+  50% { opacity: 1; transform: scaleY(1); }
+}
+
+@media (max-width: 700px) {
+  .hero-inner { padding: 48px 20px; }
+  .hero-cta-group { flex-direction: column; align-items: center; }
+  .btn { width: 100%; max-width: 300px; justify-content: center; }
+  .friction-cards { grid-template-columns: 1fr; }
+  .rules-grid { grid-template-columns: repeat(2, 1fr); }
+  .disease-list { grid-template-columns: 1fr; }
+  .topics-grid { grid-template-columns: 1fr; }
+  .cta-strip .btn-group { flex-direction: column; align-items: center; }
+}
+
+@media (max-width: 480px) {
+  .rules-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Critical Chain Project Management for the Working Forest</div>
+    <h1>Timber<br>Tempo</h1>
+    <div class="hero-subtitle">Project Flow in Forestry</div>
+    <div class="hero-author">by Steven Bick</div>
+    <div class="hero-cta-group">
+      <a href="https://www.amazon.com/Timber-Tempo-Project-Flow-Forestry/dp/B0DRYY34KW/" class="btn btn-primary">Buy on Amazon</a>
+      <a href="https://bit.ly/TimberTempoAudiobook" class="btn btn-secondary">Listen — Audiobook</a>
+    </div>
+  </div>
+  <div class="hero-scroll"><span></span><small>Explore</small></div>
+</section>
+
+<div class="divider"></div>
+
+<section class="about" id="about">
+  <h2>A New Way to Think About Forestry Projects</h2>
+  <p><strong>Timber Tempo</strong> introduces <strong>Critical Chain Project Management</strong> to the forestry and forest products world. Through vivid case stories — from sawmill operations and timber procurement to land management and agency work — this book shows how strategic planning, task synchronization, and smarter resource management lead to smoother operations and better outcomes.</p>
+  <p>Whether you're dealing with log shortages, equipment bottlenecks, multi-site coordination, or simply too many projects at once, the principles in this book offer a clear path forward.</p>
+</section>
+
+<section class="friction-strip">
+  <div class="friction-inner">
+    <h2>The Real Cost of Friction</h2>
+    <p class="tagline">In the woods, "busy" does not always mean "productive."</p>
+    <div class="friction-cards">
+      <div class="friction-card">
+        <h3>Idle Iron</h3>
+        <p>Equipment payments continue even when machines wait on wood. Delays in the woods starve the mill.</p>
+      </div>
+      <div class="friction-card">
+        <h3>Timber Degrade</h3>
+        <p>High-value timber stains and loses grade while sitting on landings. Time kills value after the tree is down.</p>
+      </div>
+      <div class="friction-card">
+        <h3>Trust Erosion</h3>
+        <p>Friction creates conflict between mill managers and foresters. When flow breaks down, relationships break down with it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="story-strip">
+  <blockquote>
+    Cliff mistakenly thought he had a band, but this lumber company was largely a collection of solo artists.
+    <cite>— From the Skanawan Lumber Story</cite>
+  </blockquote>
+</section>
+
+<section class="chapters" id="chapters">
+  <h2>Inside the Book</h2>
+  <ul class="chapter-list">
+    <li class="chapter-item"><span class="chapter-num">—</span><span class="chapter-title">Overture: A Skanawan Lumber Story</span></li>
+    <li class="chapter-item"><span class="chapter-num">01</span><span class="chapter-title">Tempo, Project Flow, and Forestry</span></li>
+    <li class="chapter-item"><span class="chapter-num">02</span><span class="chapter-title">What is Critical Chain Project Management?</span></li>
+    <li class="chapter-item"><span class="chapter-num">03</span><span class="chapter-title">Identifying the Critical Chain in a Project</span></li>
+    <li class="chapter-item"><span class="chapter-num">04</span><span class="chapter-title">Timing Tasks and Buffers</span></li>
+    <li class="chapter-item"><span class="chapter-num">05</span><span class="chapter-title">Project Flow</span></li>
+    <li class="chapter-item"><span class="chapter-num">06</span><span class="chapter-title">Shifting Culture and Improving Flow</span></li>
+    <li class="chapter-item"><span class="chapter-num">—</span><span class="chapter-title">Finale: Skanawan Lumber's Next Chapter</span></li>
+  </ul>
+</section>
+
+<section class="rules">
+  <div class="rules-inner">
+    <h2>The 8 Rules of Flow</h2>
+    <p class="rules-sub">Practical heuristics for keeping the project moving.</p>
+    <div class="rules-grid">
+      <div class="rule-card"><div class="rule-num">Rule 1</div><h3>Multi-Tasks Hold Others Back</h3><p>Stop juggling. Finish what others are waiting for.</p></div>
+      <div class="rule-card"><div class="rule-num">Rule 2</div><h3>Kit Ready, Work Steady</h3><p>Don't start without permits, layout, and markets.</p></div>
+      <div class="rule-card"><div class="rule-num">Rule 3</div><h3>Step Back and Find Cracks</h3><p>Triage priorities before they triage you.</p></div>
+      <div class="rule-card"><div class="rule-num">Rule 4</div><h3>Manage Flow, Work Will Go</h3><p>Synchronize tasks, people, and iron.</p></div>
+      <div class="rule-card"><div class="rule-num">Rule 5</div><h3>Outcome Poor? Alter Core</h3><p>Increase the dosage — apply the right resource to break the constraint.</p></div>
+      <div class="rule-card"><div class="rule-num">Rule 6</div><h3>Seek and Tweak</h3><p>Fix the root cause, not just the error.</p></div>
+      <div class="rule-card"><div class="rule-num">Rule 7</div><h3>Stacks, Not Hacks</h3><p>Standardize the routine so you can improvise the crisis.</p></div>
+      <div class="rule-card"><div class="rule-num">Rule 8</div><h3>Goals, Not Roles</h3><p>Abolish local optimums. Protect the global goal.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="diseases" id="diseases">
+  <h2>Spot the Breakdown</h2>
+  <p>The book teaches you to diagnose the "diseases" that kill project flow — and how to treat them.</p>
+  <div class="disease-list">
+    <div class="disease-card"><h3>Student Syndrome</h3><p>Waiting until the last minute to start, then scrambling when something goes wrong.</p></div>
+    <div class="disease-card"><h3>Bad Multitasking</h3><p>Switching between tasks creates friction. Sporadic log flow means the mill starts and stops.</p></div>
+    <div class="disease-card"><h3>Parkinson's Law</h3><p>Work expands to fill the time allotted. Seven weeks budgeted means seven weeks spent.</p></div>
+    <div class="disease-card"><h3>Task Dependency</h3><p>One delay cascades through the chain. When one person is late, everyone downstream is stuck.</p></div>
+  </div>
+</section>
+
+<section class="takeaway-strip">
+  <div class="inner">
+    <h3>Takeaway</h3>
+    <p>'Dosage' isn't always more people. It is applying the right iron to break the specific constraint. The sooner something is fixed, the better it works.</p>
+  </div>
+</section>
+
+<section class="topics" id="topics">
+  <h2>Who This Book Is For</h2>
+  <p>Anyone in the forestry and forest products sectors who runs projects — or gets stuck in them.</p>
+  <div class="topics-grid">
+    <div class="topic-card"><h3>Mill Operators</h3><p>Keep logs flowing, reduce downtime, and synchronize procurement with production.</p></div>
+    <div class="topic-card"><h3>Foresters &amp; Land Managers</h3><p>Coordinate contractors, permits, and harvest schedules without the chaos.</p></div>
+    <div class="topic-card"><h3>Logging Contractors</h3><p>Stop fighting bottlenecks. Finish one block before moving iron to the next.</p></div>
+    <div class="topic-card"><h3>Timberland Investors</h3><p>Understand where project value leaks and how to protect it.</p></div>
+    <div class="topic-card"><h3>Agency Leaders</h3><p>Manage multi-stakeholder forestry projects with clearer priorities and less friction.</p></div>
+    <div class="topic-card"><h3>Educators &amp; Students</h3><p>A case-driven introduction to Critical Chain thinking in a natural resource context.</p></div>
+  </div>
+</section>
+
+<section class="author" id="author">
+  <h2>About the Author</h2>
+  <p>Dr. Steven Bick is a consulting forester, educator, and founder of Northeast Forests LLC. With over thirty years of experience in forestry and related fields, Steve simplifies theories and ideas into practical actions, publications, and products that help forests, people, and rural enterprises. He is the author or coauthor of ten books on forestry and conservation topics and the director of the Vermont Forest Business School.</p>
+  <div class="author-links">
+    <a href="https://www.northeastforests.com/">Northeast Forests</a>
+    <a href="https://www.vtfbs.com/">Forest Business School</a>
+    <a href="https://loggingchance.com/">Logging Chance</a>
+  </div>
+</section>
+
+<section class="cta-strip">
+  <h2>Get Your Copy</h2>
+  <p>Available in print, Kindle, and audiobook editions.</p>
+  <div class="btn-group">
+    <a href="https://www.amazon.com/Timber-Tempo-Project-Flow-Forestry/dp/B0DRYY34KW/" class="btn btn-light">Buy on Amazon</a>
+    <a href="https://bit.ly/TimberTempoAudiobook" class="btn btn-outline-light">Audiobook</a>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2024 Northeast Forests LLC &middot; Published by The Vermont Forest Business School, Ltd.</p>
+  <p>ISBN 979-8-89496-116-3</p>
+</footer>
+
+</body>
+</html>
